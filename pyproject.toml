@@ -1,0 +1,14 @@
+[project]
+name = "domia-core"
+version = "0.1.0"
+description = "DomIA Cognitive Operating System"
+requires-python = ">=3.13"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.black]
+line-length = 88
