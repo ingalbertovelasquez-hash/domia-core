@@ -1,16 +1,19 @@
-# Virtual environment
-.venv/
-
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Pytest
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environment
+.venv/
+venv/
 
 # macOS
 .DS_Store
 
 # VS Code
 .vscode/
+
+# Logs
+*.log
