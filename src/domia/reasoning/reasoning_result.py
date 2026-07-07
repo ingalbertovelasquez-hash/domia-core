@@ -1,16 +1,23 @@
 from dataclasses import dataclass, field
 
+from domia.cognition.planner.plan import Plan
+from domia.reasoning.goal import Goal
+from domia.reasoning.strategy import Strategy
+
 
 @dataclass(frozen=True)
 class ReasoningResult:
     """
     Resultado producido por el Reasoning Engine.
 
-    Describe cómo DomIA debe abordar un problema,
-    sin ejecutar todavía el razonamiento.
+    Describe cómo DomIA debe abordar un problema.
     """
 
-    strategy: str
+    strategy: Strategy
+
+    goals: list[Goal]
+
+    plan: Plan
 
     confidence: float
 
