@@ -1,4 +1,5 @@
 from domia.inference.mock_provider import MockProvider
+from domia.inference.openai_provider import OpenAIProvider
 from domia.inference.provider import Provider
 
 
@@ -17,6 +18,9 @@ class ProviderFactory:
 
         if provider == "mock":
             return MockProvider()
+
+        if provider == "openai":
+            return OpenAIProvider()
 
         raise ValueError(
             f"Unknown provider: {name}"
