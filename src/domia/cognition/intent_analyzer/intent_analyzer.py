@@ -4,41 +4,54 @@ from domia.cognition.contracts.objective import Objective
 
 class IntentAnalyzer:
     """
-    Analizador de intención (v1).
+    Analizador de intención v2.
 
-    Primera implementación basada en reglas.
-    Su interfaz permanecerá estable cuando
-    evolucionemos hacia IA semántica.
+    Implementación basada en reglas,
+    preparada para evolucionar hacia
+    clasificación semántica.
     """
 
     ACTIONS = {
+        # Creación
         "crear": "create",
         "crea": "create",
         "diseñar": "create",
         "disenar": "create",
         "generar": "create",
         "construir": "create",
+
+        # Explicación
+        "qué es": "explain",
+        "que es": "explain",
+        "explica": "explain",
+        "explícame": "explain",
+        "explicame": "explain",
+        "define": "explain",
+
+        # Análisis
         "analizar": "analyze",
         "buscar": "search",
         "comparar": "compare",
-    }
 
-    DOMAINS = {
-        "curso": "education",
-        "universidad": "education",
-        "escuela": "education",
-        "abogado": "legal",
-        "abogados": "legal",
-        "contrato": "legal",
-        "empresa": "business",
-        "ventas": "business",
-        "finanzas": "finance",
-        "ia": "artificial_intelligence",
+        # Resumen
+        "resume": "summarize",
+        "resumir": "summarize",
     }
 
     def analyze(self, objective: Objective) -> Intent:
+        """
+        Analiza el objetivo y determina:
+
+        - acción
+        - dominio
+        - capacidades requeridas
+        """
 
         text = objective.text.lower()
+
+        # --------------------------------------------------
+        # Acción
+        # --------------------------------------------------
 
         action = "unknown"
 
@@ -47,17 +60,51 @@ class IntentAnalyzer:
                 action = value
                 break
 
-        # Dominio principal
+        # --------------------------------------------------
+        # Dominio (con prioridad)
+        # --------------------------------------------------
+
         domain = "general"
 
-        if "curso" in text:
+        # Educación tiene prioridad
+        if (
+            "curso" in text
+            or "universidad" in text
+            or "escuela" in text
+        ):
             domain = "education"
-        elif "abogado" in text or "abogados" in text:
+
+        # Luego legal
+        elif (
+            "abogado" in text
+            or "abogados" in text
+            or "contrato" in text
+        ):
             domain = "legal"
-        elif "empresa" in text:
+
+        # Luego negocios
+        elif (
+            "empresa" in text
+            or "ventas" in text
+        ):
             domain = "business"
 
-        subject = objective.text
+        # Luego finanzas
+        elif "finanzas" in text:
+            domain = "finance"
+
+        # Finalmente IA
+        elif (
+            "ia" in text
+            or "inteligencia artificial" in text
+            or "aprendizaje" in text
+            or "machine learning" in text
+        ):
+            domain = "artificial_intelligence"
+
+        # --------------------------------------------------
+        # Capacidades requeridas
+        # --------------------------------------------------
 
         capabilities = [
             "knowledge_search",
@@ -68,7 +115,7 @@ class IntentAnalyzer:
         return Intent(
             action=action,
             domain=domain,
-            subject=subject,
+            subject=objective.text,
             confidence=0.95,
             required_capabilities=capabilities,
         )

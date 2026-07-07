@@ -1,3 +1,4 @@
+from domia.config.settings import Settings
 from domia.inference.mock_provider import MockProvider
 from domia.inference.openai_provider import OpenAIProvider
 from domia.inference.provider import Provider
@@ -12,9 +13,15 @@ class ProviderFactory:
     """
 
     @staticmethod
-    def create(name: str = "mock") -> Provider:
+    def create(
+        name: str | None = None,
+    ) -> Provider:
 
-        provider = name.lower()
+        settings = Settings.load()
+
+        provider = (
+            name or settings.provider
+        ).lower()
 
         if provider == "mock":
             return MockProvider()
@@ -23,5 +30,5 @@ class ProviderFactory:
             return OpenAIProvider()
 
         raise ValueError(
-            f"Unknown provider: {name}"
+            f"Unknown provider: {provider}"
         )

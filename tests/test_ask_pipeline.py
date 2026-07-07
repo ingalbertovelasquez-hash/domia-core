@@ -9,10 +9,16 @@ def test_run_pipeline():
         "Quiero crear un curso de IA para abogados"
     )
 
-    assert result["status"] == "READY"
+    assert result["status"] == "COMPLETED"
 
     assert result["intent"].action == "create"
 
-    assert len(result["plan"].steps) == 6
-
     assert result["decision"] is not None
+
+    assert result["context"] is not None
+
+    assert result["prompt"] is not None
+
+    assert result["response"] is not None
+
+    assert "Objective:" in result["prompt"]

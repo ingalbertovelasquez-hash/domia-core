@@ -1,7 +1,6 @@
-import os
-
 from openai import OpenAI
 
+from domia.config.settings import Settings
 from domia.inference.provider import Provider
 
 
@@ -15,14 +14,16 @@ class OpenAIProvider(Provider):
 
     def __init__(
         self,
-        model: str = "gpt-5.5",
+        model: str | None = None,
     ) -> None:
 
-        self.client = OpenAI(
-            api_key=os.getenv("OPENAI_API_KEY")
-        )
+        settings = Settings.load()
 
-        self.model = model
+        self.model = model or settings.model
+
+        self.client = OpenAI(
+            api_key=settings.api_key,
+        )
 
     def generate(self, prompt: str) -> str:
 
