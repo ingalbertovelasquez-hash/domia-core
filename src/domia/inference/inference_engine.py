@@ -1,4 +1,5 @@
 from domia.inference.provider import Provider
+from domia.inference.provider_factory import ProviderFactory
 
 
 class InferenceEngine:
@@ -9,9 +10,16 @@ class InferenceEngine:
     al proveedor configurado.
     """
 
-    def __init__(self, provider: Provider):
+    def __init__(
+        self,
+        provider: Provider | None = None,
+    ):
 
-        self.provider = provider
+        self.provider = (
+            provider
+            if provider is not None
+            else ProviderFactory.create()
+        )
 
     def generate(self, prompt: str) -> str:
 
