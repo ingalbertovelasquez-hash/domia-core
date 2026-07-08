@@ -8,14 +8,26 @@ def test_decision_engine():
 
     engine = DecisionEngine(graph)
 
-    decision = engine.decide(
-        "DomIA PECRA"
-    )
+    decision = engine.decide("DomIA PECRA")
 
     assert decision.objective == "DomIA PECRA"
-
-    assert len(decision.recommended_nodes) >= 2
 
     assert "DomIA" in decision.recommended_nodes
 
     assert "PECRA" in decision.recommended_nodes
+
+    assert len(decision.recommended_nodes) <= 5
+
+
+def test_decision_engine_custom_top_k():
+
+    graph = load_foundation_graph()
+
+    engine = DecisionEngine(graph)
+
+    decision = engine.decide(
+        "Artificial Intelligence Machine Learning",
+        top_k=3,
+    )
+
+    assert len(decision.recommended_nodes) <= 3

@@ -1,23 +1,54 @@
 from domia.cognition.decision_engine.decision import Decision
 from domia.domain.services.knowledge_graph import KnowledgeGraph
+from domia.embeddings.embedding_engine import EmbeddingEngine
+from domia.embeddings.mock_embedding_provider import (
+    MockEmbeddingProvider,
+)
 
 
 class DecisionEngine:
     """
-    Decision Engine v1.
+    Decision Engine v3.
 
-    Selecciona conocimiento relevante utilizando
-    una coincidencia simple de palabras clave.
+    Selecciona conocimiento utilizando
+    ranking por palabras clave y prepara
+    la integración con búsqueda semántica.
     """
 
+    DEFAULT_TOP_K = 5
+
     def __init__(self, graph: KnowledgeGraph):
+
         self.graph = graph
 
-    def decide(self, objective: str) -> Decision:
+        self.embedding_engine = EmbeddingEngine(
+            MockEmbeddingProvider()
+        )
+
+    def decide(
+        self,
+        objective: str,
+        top_k: int | None = None,
+    ) -> Decision:
+
+        if top_k is None:
+            top_k = self.DEFAULT_TOP_K
+
+        # --------------------------------------------------
+        # Generación del embedding de la consulta
+        # (todavía no se utiliza para el ranking)
+        # --------------------------------------------------
+
+        query_embedding = self.embedding_engine.embed(
+            objective
+        )
+
+        # Evita advertencias de variable no utilizada.
+        _ = query_embedding
 
         objective_lower = objective.lower()
 
-        recommended = []
+        ranking: list[tuple[int, str]] = []
 
         for node in self.graph.all_nodes():
 
@@ -31,22 +62,39 @@ class DecisionEngine:
 
             for word in objective_lower.split():
 
-                if word in searchable:
+                token = word.strip(".,!?()[]{}:;")
+
+                if len(token) < 2:
+                    continue
+
+                if token in searchable:
                     score += 1
 
             if score > 0:
-                recommended.append((score, node.name))
+                ranking.append(
+                    (
+                        score,
+                        node.name,
+                    )
+                )
 
-        recommended.sort(reverse=True)
+        ranking.sort(
+            key=lambda item: item[0],
+            reverse=True,
+        )
 
-        result = [
-            node_name
-            for _, node_name in recommended
+        recommended = [
+            node
+            for _, node in ranking[:top_k]
         ]
 
         return Decision(
             objective=objective,
-            recommended_nodes=result,
-            reasoning="Knowledge ranked by keyword relevance.",
-            recommended_engine="Pending",
+            recommended_nodes=recommended,
+            reasoning=(
+                f"Top-{top_k} knowledge ranked by "
+                "keyword relevance. "
+                "Semantic embedding generated."
+            ),
+            recommended_engine="Decision Engine v3",
         )
