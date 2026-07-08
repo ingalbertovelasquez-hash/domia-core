@@ -1,5 +1,6 @@
 from domia.cognition.contracts.context import Context
 from domia.cognition.prompt_builder.prompt_builder import PromptBuilder
+from domia.config.settings import Settings
 from domia.inference.inference_engine import InferenceEngine
 from domia.inference.provider_factory import ProviderFactory
 
@@ -15,20 +16,32 @@ class InferencePipeline:
 
         self.prompt_builder = PromptBuilder()
 
-        provider = ProviderFactory.create()
+        self.settings = Settings.load()
+
+        provider = ProviderFactory.create(
+            self.settings.provider
+        )
 
         self.engine = InferenceEngine(
             provider
         )
 
-    def run(self, context: Context) -> dict:
+    def run(
+        self,
+        context: Context,
+    ) -> dict:
 
-        prompt = self.prompt_builder.build(context)
+        prompt = self.prompt_builder.build(
+            context
+        )
 
-        response = self.engine.generate(prompt)
+        response = self.engine.generate(
+            prompt
+        )
 
         return {
             "prompt": prompt,
             "response": response,
+            "provider": self.settings.provider,
             "status": "COMPLETED",
         }

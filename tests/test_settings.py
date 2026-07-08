@@ -8,6 +8,7 @@ def test_default_settings():
     assert settings.provider in (
         "mock",
         "openai",
+        "ollama",
     )
 
-    assert isinstance(settings.model, str)
+    assert settings.model

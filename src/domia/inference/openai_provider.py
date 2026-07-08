@@ -1,6 +1,7 @@
+import os
+
 from openai import OpenAI
 
-from domia.config.settings import Settings
 from domia.inference.provider import Provider
 
 
@@ -14,18 +15,32 @@ class OpenAIProvider(Provider):
 
     def __init__(
         self,
-        model: str | None = None,
+        model: str = "gpt-5.5",
     ) -> None:
 
-        settings = Settings.load()
+        self.model = model
 
-        self.model = model or settings.model
+        self._client: OpenAI | None = None
 
-        self.client = OpenAI(
-            api_key=settings.api_key,
-        )
+    @property
+    def client(self) -> OpenAI:
+        """
+        Crea el cliente únicamente cuando
+        realmente se necesita.
+        """
 
-    def generate(self, prompt: str) -> str:
+        if self._client is None:
+
+            self._client = OpenAI(
+                api_key=os.getenv("OPENAI_API_KEY")
+            )
+
+        return self._client
+
+    def generate(
+        self,
+        prompt: str,
+    ) -> str:
 
         response = self.client.responses.create(
             model=self.model,

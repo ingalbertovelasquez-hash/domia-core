@@ -22,4 +22,6 @@ def test_inference_pipeline():
 
     assert "Objective:" in result["prompt"]
 
-    assert "Mock Response" in result["response"]
+    assert isinstance(result["response"], str)
+
+    assert len(result["response"]) > 0

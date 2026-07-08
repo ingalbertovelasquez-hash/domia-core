@@ -1,5 +1,6 @@
 from domia.config.settings import Settings
 from domia.inference.mock_provider import MockProvider
+from domia.inference.ollama_provider import OllamaProvider
 from domia.inference.openai_provider import OpenAIProvider
 from domia.inference.provider import Provider
 
@@ -28,6 +29,9 @@ class ProviderFactory:
 
         if provider == "openai":
             return OpenAIProvider()
+
+        if provider == "ollama":
+            return OllamaProvider()
 
         raise ValueError(
             f"Unknown provider: {provider}"
